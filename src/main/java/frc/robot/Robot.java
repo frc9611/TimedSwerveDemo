@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Joystick;
@@ -9,6 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.sensors.Gyro;
 import frc.robot.swerve.SwerveConstraints;
 import frc.robot.swerve.SwerveManager;
+import frc.robot.swerve.SwerveModule;
+import frc.robot.swerve.SwervePosition;
 
 public class Robot extends TimedRobot {
 
@@ -86,11 +89,43 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  @Override
-  public void testInit() {}
+  private SwerveModule testSwerve;
 
   @Override
-  public void testPeriodic() {}
+  public void testInit() {
+    joy0 = new Joystick(0);
+
+    testSwerve = new SwerveModule(               "Swerve Teste",
+            SwervePosition.FRONT_LEFT,
+            10, // CAN ID drive Motor
+            20, // CAN ID turning Motor
+            false,
+            false,
+            1, // Analog Port of Absolute Encoder
+            0,
+            false);
+
+
+  }
+
+  @Override
+  public void testPeriodic() {
+    if(joy0.getRawButtonPressed(XboxController.Button.kB.value)) Gyro.zeroHeading();
+
+    double speed = joy0.getRawAxis(1);
+    double turn = joy0.getRawAxis(4);
+
+    speed = Math.abs(speed) > SwerveConstraints.kDeadband ? speed : 0;
+    turn = Math.abs(turn) > SwerveConstraints.kDeadband ? turn : 0;
+
+    speed = xLimiter.calculate(speed) * SwerveConstraints.kTeleOpMaxAccel;
+    turn = turnLimiter.calculate(turn) * SwerveConstraints.kTeleOpMaxRotRps;
+
+    double rad = 0;
+    rad += (testSwerve.getTurningPosition() + turn > 0 ? 5 : -5);
+    if(turn == 0) rad = testSwerve.getTurningPosition();
+    testSwerve.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromRadians(rad)));
+  }
 
   @Override
   public void simulationInit() {}
