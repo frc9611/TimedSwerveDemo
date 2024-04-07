@@ -1,12 +1,17 @@
 package frc.robot;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.sensors.Gyro;
 import frc.robot.swerve.SwerveConstraints;
 import frc.robot.swerve.SwerveManager;
@@ -16,6 +21,11 @@ import frc.robot.swerve.SwervePosition;
 public class Robot extends TimedRobot {
 
   public SwerveManager swerveManager = new SwerveManager();
+  public Field2d field2d = new Field2d();
+  public Pose2d pose2d = new Pose2d();
+
+  public StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
 
   @Override
   public void robotInit() {
@@ -34,6 +44,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Gyro.periodic();
+    field2d.setRobotPose(Gyro.ahrs.getDisplacementX(), Gyro.ahrs.getDisplacementY(), Gyro.getRotation2d());
+    SmartDashboard.putData("Field", field2d);
   }
 
   @Override
@@ -59,7 +71,7 @@ public class Robot extends TimedRobot {
 
     if(joy0.getRawButtonPressed(XboxController.Button.kB.value)) Gyro.zeroHeading();
 
-    double xSpeed = joy0.getRawAxis(0);
+    double xSpeed = -joy0.getRawAxis(1);
     double ySpeed = -joy0.getRawAxis(0);
     double turningSpeed = joy0.getRawAxis(4);
     boolean fieldOrientedFn = !joy0.getRawButton(XboxController.Button.kA.value);
@@ -81,6 +93,8 @@ public class Robot extends TimedRobot {
 
     SwerveModuleState[] moduleStates = SwerveConstraints.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveManager.setModuleStates(moduleStates);
+
+    publisher.set(moduleStates);
   }
 
   @Override

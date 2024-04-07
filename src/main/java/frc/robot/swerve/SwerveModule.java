@@ -41,8 +41,8 @@ public class SwerveModule {
         driveMotor.setInverted(driveMotorReversed);
         turningMotor.setInverted(turningMotorReversed);
 
-        driveEncoder = (SparkRelativeEncoder) driveMotor.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
-        turningEncoder = (SparkRelativeEncoder) driveMotor.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
+        driveEncoder = (SparkRelativeEncoder) driveMotor.getEncoder();
+        turningEncoder = (SparkRelativeEncoder) driveMotor.getEncoder();
 
         driveEncoder.setPositionConversionFactor(SwerveConstraints.kDriveEncoderRot2Meter);
         driveEncoder.setVelocityConversionFactor(SwerveConstraints.kDriveEncoderRPM2Mps);

@@ -17,11 +17,11 @@ public class SwerveManager {
                 SwervePosition.FRONT_LEFT,
                 10, // CAN ID drive Motor
                 20, // CAN ID turning Motor
-                false,
+                true,
                 false,
                 1, // Analog Port of Absolute Encoder
                 0,
-                false
+                true
         );
 
         SwerveModule frontRight = new SwerveModule(
@@ -41,15 +41,15 @@ public class SwerveManager {
                 SwervePosition.BACK_LEFT,
                 12, // CAN ID drive Motor
                 22, // CAN ID turning Motor
-                false,
+                true,
                 false,
                 3, // Analog Port of Absolute Encoder
                 0,
-                false
+                true
         );
 
         SwerveModule backRight = new SwerveModule(
-                "Swerve Traseiro Esquerdo",
+                "Swerve Traseiro Direito",
                 SwervePosition.BACK_RIGHT,
                 13, // CAN ID drive Motor
                 23, // CAN ID turning Motor
